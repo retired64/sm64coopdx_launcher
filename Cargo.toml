@@ -1,0 +1,33 @@
+[package]
+name = "sm64coopdx-launcher"
+version = "2.0.0"
+edition = "2024"
+description = "Lightweight SDL2 launcher for SM64 Coop DX"
+
+# Deviation from spec §23: spec specified sdl2 = "0.37", but v0.37.0 was never
+# published to crates.io. Using latest stable 0.38.x instead (API is compatible).
+#
+# Deviation from spec §23: features include "unsafe_textures". The spec's
+# Cargo.toml uses ["image", "mixer", "ttf"] without this flag, but in practice
+# Texture<'r> borrows Canvas<'r> via phantom lifetimes, preventing &mut canvas
+# access during render. "unsafe_textures" removes the phantom lifetime so
+# Texture is 'static — this is the standard production pattern for SDL2 Rust
+# apps and carries no more unsafety than the underlying C FFI already has.
+[dependencies]
+sdl2 = { version = "0.38", features = ["image", "mixer", "ttf", "unsafe_textures"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+reqwest = { version = "0.12", features = ["blocking"] }
+zip = "2"
+ctrlc = "3"
+dirs = "5"
+toml = "0.8"
+log = "0.4"
+env_logger = "0.11"
+md5 = "0.7"
+
+[profile.release]
+opt-level = "z"
+lto = true
+strip = true
+codegen-units = 1
